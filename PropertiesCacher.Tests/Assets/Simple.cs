@@ -30,4 +30,15 @@
 
         public SimpleStruct(int value) => this.Prop = value;
     }
+
+    public interface SimpleInterface
+    {
+        public int Prop { get; set; }
+    }
+
+    public class SimpleInterfaceImp : SimpleInterface
+    {
+        public int Prop { get; set; }
+        public SimpleInterfaceImp(int value) => this.Prop = value;
+    }
 }

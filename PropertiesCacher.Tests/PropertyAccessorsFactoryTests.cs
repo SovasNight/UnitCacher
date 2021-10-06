@@ -99,5 +99,29 @@ namespace PropertiesCacher.Tests
 
             Assert.Equal(arg, instance.Prop);
         }
+
+        [Fact]
+        public void CreateAccessor_SimpleInterface_Get_Value_100() {
+            PropertyInfo pi = typeof(Assets.SimpleInterface).GetProperty("Prop");
+            PropertyAccessorsFactory factory = new PropertyAccessorsFactory();
+            var instance = new Assets.SimpleInterfaceImp(100);
+
+            PropertyAccessor accessor = factory.CreateAccessor(pi);
+            object result = accessor.Get_Value(instance);
+
+            Assert.Equal(instance.Prop, result);
+        }
+
+        [Fact]
+        public void CreateAccessor_SimpleInterface_Set_Value_100() {
+            PropertyInfo pi = typeof(Assets.SimpleInterface).GetProperty("Prop");
+            PropertyAccessorsFactory factory = new PropertyAccessorsFactory();
+            var instance = new Assets.SimpleInterfaceImp(0);
+
+            PropertyAccessor accessor = factory.CreateAccessor(pi);
+            accessor.Set_Value(instance, 100);
+
+            Assert.Equal(100, instance.Prop);
+        }
     }
 }
