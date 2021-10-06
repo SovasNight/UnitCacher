@@ -40,4 +40,24 @@
         public override int VirtualProp { get => base.VirtualProp; set => base.VirtualProp = value; }
         public TestDescernant(int value) : base(value) { }
     }
+
+    public class TestRefProperyClass
+    {
+        private int intValue;
+        private SimpleStruct structValue;
+        private SimpleClass classValue;
+        private SimpleInterface interfaceValue;
+
+        public ref int IntProp => ref intValue;
+        public ref SimpleStruct StructProp => ref structValue;
+        public ref SimpleClass ClassProp => ref classValue;
+        public ref SimpleInterface InterfaceProp => ref interfaceValue;
+
+        public TestRefProperyClass(int value) {
+            this.intValue = value;
+            this.structValue = new SimpleStruct(value);
+            this.classValue = new SimpleClass(value);
+            this.interfaceValue = new TestInterfaceImp(value);
+        }
+    }
 }

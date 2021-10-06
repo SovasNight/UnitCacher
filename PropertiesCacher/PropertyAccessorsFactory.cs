@@ -59,10 +59,21 @@ namespace PropertiesCacher
                 emit.CastClass(mi.DeclaringType);
 
                 emit.CallVirtual(mi);
-                if (mi.ReturnType.IsValueType) {
-                    emit.Box(mi.ReturnType);
+
+                Type castType = mi.ReturnType;
+                if (castType.IsByRef) {
+                    castType = castType.GetElementType();
+                    if (!castType.IsPrimitive && castType.IsValueType) {
+                        emit.LoadObject(castType);
+                    } else {
+                        emit.LoadIndirect(castType);
+                    }
+                }
+
+                if (castType.IsValueType){
+                    emit.Box(castType);
                 } else {
-                    emit.CastClass(mi.ReturnType);
+                    emit.CastClass(castType);
                 }
 
                 emit.Return();

@@ -83,5 +83,23 @@ namespace PropertiesCacher.Tests
             object result = instance.Prop;
             Assert.Equal(except, result);
         }
+
+        public static IEnumerable<object[]> TestRefProperyClass_All_PropertyName() {
+            return typeof(Assets.TestRefProperyClass).GetProperties().Select(
+                p => new object[] { p.Name }).ToList();
+        }
+
+        [Theory]
+        [MemberData(nameof(TestRefProperyClass_All_PropertyName))]
+        public void CreateAccesor_TestRefProperyClass_Get_Value(string pName) {
+            PropertyInfo pi = typeof(Assets.TestRefProperyClass).GetProperty(pName);
+            var instance = new Assets.TestRefProperyClass(100);
+            var except = pi.GetValue(instance);
+
+            PropertyAccessor accessor = new PropertyAccessorsFactory().CreateAccessor(pi);
+            object result = accessor.Get_Value(instance);
+
+            Assert.Equal(except, result);
+        }
     }
 }
