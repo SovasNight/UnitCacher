@@ -11,15 +11,14 @@ namespace PropertiesCacher
     /// </summary>
     public class PropertyAccessorsFactory
     {
-        AssemblyBuilder assemblyBuilder;
-        ModuleBuilder moduleBuilder;
+        private readonly AssemblyBuilder assemblyBuilder;
+        private readonly ModuleBuilder moduleBuilder;
 
         /// <summary>
         /// Initialize instance of <see cref="PropertyAccessorsFactory"/> and
         /// define dynamic assembly "PropertiesAccessors"
         /// </summary>
-        public PropertyAccessorsFactory()
-        {
+        public PropertyAccessorsFactory() {
             this.assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(
                 new AssemblyName("PropertiesAccessors"), AssemblyBuilderAccess.RunAndCollect);
 
@@ -30,10 +29,9 @@ namespace PropertiesCacher
         /// Create <see cref="PropertyAccessor"/> for specifed property
         /// using <see cref="PropertyInfo"/>
         /// </summary>
-        public PropertyAccessor CreateAccessor(PropertyInfo pi)
-        {
+        public PropertyAccessor CreateAccessor(PropertyInfo pi) {
             Type baseType = typeof(PropertyAccessor);
-            string typeName = string.Format("{0}_{1}_Accessor", pi.DeclaringType.Name, pi.Name);
+            string typeName = String.Format("{0}_{1}_Accessor", pi.DeclaringType.Name, pi.Name);
             TypeBuilder typeBuilder = this.moduleBuilder.DefineType(typeName, TypeAttributes.Public, baseType);
 
             MethodInfo get_value = this.CreateGetter(typeBuilder, pi.GetGetMethod());
@@ -43,62 +41,56 @@ namespace PropertiesCacher
             typeBuilder.DefineMethodOverride(set_value, baseType.GetMethod("Set_Value"));
 
             Type accessorType = typeBuilder.CreateType();
-            
+
             return (PropertyAccessor)Activator.CreateInstance(accessorType);
         }
 
-        private MethodInfo CreateGetter(TypeBuilder typeBuilder, MethodInfo mi)
-        {
-            Emit<Func<object, object>> emit = Emit<Func<object, object>>.BuildMethod(
+        private MethodInfo CreateGetter(TypeBuilder typeBuilder, MethodInfo mi) {
+            var emit = Emit<Func<object, object>>.BuildMethod(
                 typeBuilder, "Get_Value",
                 MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.Virtual,
                 CallingConventions.HasThis);
 
-            if (mi is null)
-            {
+            if (mi is null) {
                 emit.NewObject<NotImplementedException>();
                 emit.Throw();
-            }
-            else
-            {
+            } else {
                 emit.LoadArgument(1);
                 emit.CastClass(mi.DeclaringType);
 
                 emit.CallVirtual(mi);
-                if (mi.ReturnType.IsValueType)
+                if (mi.ReturnType.IsValueType) {
                     emit.Box(mi.ReturnType);
-                else
+                } else {
                     emit.CastClass(mi.ReturnType);
+                }
 
                 emit.Return();
             }
             return emit.CreateMethod();
         }
 
-        private MethodInfo CreateSetter(TypeBuilder typeBuilder, MethodInfo mi)
-        {
-            Emit<Action<object, object>> emit = Emit<Action<object, object>>.BuildMethod(
-                typeBuilder, "Set_Value", 
+        private MethodInfo CreateSetter(TypeBuilder typeBuilder, MethodInfo mi) {
+            var emit = Emit<Action<object, object>>.BuildMethod(
+                typeBuilder, "Set_Value",
                 MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.Virtual,
                 CallingConventions.HasThis);
 
-            if (mi is null)
-            {
+            if (mi is null) {
                 emit.NewObject<NotImplementedException>();
                 emit.Throw();
-            }
-            else
-            {
+            } else {
                 Type argType = mi.GetParameters()[0].ParameterType;
 
                 emit.LoadArgument(1);
                 emit.CastClass(mi.DeclaringType);
 
                 emit.LoadArgument(2);
-                if (argType.IsValueType)
+                if (argType.IsValueType) {
                     emit.UnboxAny(argType);
-                else
+                } else {
                     emit.CastClass(argType);
+                }
 
                 emit.CallVirtual(mi);
                 emit.Return();
