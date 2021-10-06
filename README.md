@@ -1,10 +1,16 @@
 # UnitCacher
-Provides classes for caching .net units.
-
-Requers `.net Standart 2.1` (Tests `.net Core 3.1` )
+Project represent the `.NET Standart 2.1` library for caching .net units.
+All tests using `.NET Core 3.0` runtime.
 ## PropertiesCacher
-Provides classes for caching Class Properties
+Represent abstract class with factory to caching properties of 
+classes, interfaces, structures.
 
+
+For each sepecify property `PropertyAccessorsFactory.CreateAccessor(PropertyInfo pi)`
+creates instance of dynamic type wich implement abstract class.
+
+
+`PropertyAccessor` methods is delegate invokes to accessor methods of the Property for specify instance.
 ### Using
 ```C#
 public class Program
@@ -33,10 +39,3 @@ public class TestClass
     public Prop { get; set; }
 }
 ```
-
-### Not implemented now
-Handling virtuals properties (Defined in class or interface).
-Handing static properties.
-Handing properties by ref.
-Casting from assignable types.
-Caching valueTypes properties.
