@@ -26,4 +26,9 @@ namespace PropertiesCacher.Tests.Assets
     {
         public abstract int Prop { get; set; }
     }
+
+    public static class SimpleStaticClass
+    {
+        public static int Prop { get; set; }
+    }
 }

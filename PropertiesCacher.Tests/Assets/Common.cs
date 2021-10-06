@@ -41,7 +41,7 @@
         public TestDescernant(int value) : base(value) { }
     }
 
-    public class TestRefProperyClass
+    public class TestRefPropClass
     {
         private int intValue;
         private SimpleStruct structValue;
@@ -53,11 +53,16 @@
         public ref SimpleClass ClassProp => ref classValue;
         public ref SimpleInterface InterfaceProp => ref interfaceValue;
 
-        public TestRefProperyClass(int value) {
+        public TestRefPropClass(int value) {
             this.intValue = value;
             this.structValue = new SimpleStruct(value);
             this.classValue = new SimpleClass(value);
             this.interfaceValue = new TestInterfaceImp(value);
         }
+    }
+
+    public class TestStaticPropClass
+    {
+        public static int Prop { get; set; }
     }
 }

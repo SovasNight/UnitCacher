@@ -85,20 +85,68 @@ namespace PropertiesCacher.Tests
         }
 
         public static IEnumerable<object[]> TestRefProperyClass_All_PropertyName() {
-            return typeof(Assets.TestRefProperyClass).GetProperties().Select(
+            return typeof(Assets.TestRefPropClass).GetProperties().Select(
                 p => new object[] { p.Name }).ToList();
         }
 
         [Theory]
         [MemberData(nameof(TestRefProperyClass_All_PropertyName))]
         public void CreateAccesor_TestRefProperyClass_Get_Value(string pName) {
-            PropertyInfo pi = typeof(Assets.TestRefProperyClass).GetProperty(pName);
-            var instance = new Assets.TestRefProperyClass(100);
+            PropertyInfo pi = typeof(Assets.TestRefPropClass).GetProperty(pName);
+            var instance = new Assets.TestRefPropClass(100);
             var except = pi.GetValue(instance);
 
             PropertyAccessor accessor = new PropertyAccessorsFactory().CreateAccessor(pi);
             object result = accessor.Get_Value(instance);
 
+            Assert.Equal(except, result);
+        }
+
+        [Fact]
+        public void CreateAccesor_TestStaticPropClass_Get_Value_100() {
+            PropertyInfo pi = typeof(Assets.TestStaticPropClass).GetProperty("Prop");
+            Assets.TestStaticPropClass.Prop = 100;
+            var except = 100;
+
+            PropertyAccessor accessor = new PropertyAccessorsFactory().CreateAccessor(pi);
+            object result = accessor.Get_Value(null);
+
+            Assert.Equal(except, result);
+        }
+
+        [Fact]
+        public void CreateAccesor_TestStaticPropClass_Set_Value_100() {
+            PropertyInfo pi = typeof(Assets.TestStaticPropClass).GetProperty("Prop");
+            var except = 100;
+
+            PropertyAccessor accessor = new PropertyAccessorsFactory().CreateAccessor(pi);
+            accessor.Set_Value(null, except);
+
+            object result = Assets.TestStaticPropClass.Prop;
+            Assert.Equal(except, result);
+        }
+
+        [Fact]
+        public void CreateAccesor_SimpleStaticClass_Get_Value() {
+            PropertyInfo pi = typeof(Assets.SimpleStaticClass).GetProperty("Prop");
+            Assets.SimpleStaticClass.Prop = 100;
+            var except = 100;
+
+            PropertyAccessor accessor = new PropertyAccessorsFactory().CreateAccessor(pi);
+            object result = accessor.Get_Value(null);
+
+            Assert.Equal(except, result);
+        }
+
+        [Fact]
+        public void CreateAccesor_SimpleStaticClass_Set_Value() {
+            PropertyInfo pi = typeof(Assets.SimpleStaticClass).GetProperty("Prop");
+            var except = 100;
+
+            PropertyAccessor accessor = new PropertyAccessorsFactory().CreateAccessor(pi);
+            accessor.Set_Value(null, except);
+
+            object result = Assets.SimpleStaticClass.Prop;
             Assert.Equal(except, result);
         }
     }

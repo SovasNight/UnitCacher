@@ -55,10 +55,13 @@ namespace PropertiesCacher
                 emit.NewObject<NotImplementedException>();
                 emit.Throw();
             } else {
-                emit.LoadArgument(1);
-                emit.CastClass(mi.DeclaringType);
-
-                emit.CallVirtual(mi);
+                if (!mi.IsStatic) {
+                    emit.LoadArgument(1);
+                    emit.CastClass(mi.DeclaringType);
+                    emit.CallVirtual(mi);
+                } else {
+                    emit.Call(mi);
+                }
 
                 Type castType = mi.ReturnType;
                 if (castType.IsByRef) {
@@ -93,8 +96,10 @@ namespace PropertiesCacher
             } else {
                 Type argType = mi.GetParameters()[0].ParameterType;
 
-                emit.LoadArgument(1);
-                emit.CastClass(mi.DeclaringType);
+                if (!mi.IsStatic) {
+                    emit.LoadArgument(1);
+                    emit.CastClass(mi.DeclaringType);
+                }
 
                 emit.LoadArgument(2);
                 if (argType.IsValueType) {
@@ -103,7 +108,11 @@ namespace PropertiesCacher
                     emit.CastClass(argType);
                 }
 
-                emit.CallVirtual(mi);
+                if (!mi.IsStatic) {
+                    emit.CallVirtual(mi);
+                } else {
+                    emit.Call(mi);
+                }
                 emit.Return();
             }
 
