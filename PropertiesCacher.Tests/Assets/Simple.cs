@@ -1,27 +1,13 @@
-﻿namespace PropertiesCacher.Tests.Assets
+﻿#pragma warning disable IDE1006
+
+namespace PropertiesCacher.Tests.Assets
 {
+    // Assets of types for using as Property Type
+
     public class SimpleClass
     {
         public int Prop { get; set; }
         public SimpleClass(int value) => this.Prop = value;
-    }
-
-    public class GetOnyProp
-    {
-        public int Prop { get; }
-        public GetOnyProp(int value) => this.Prop = value;
-    }
-
-    public class SimpleObjectProp
-    {
-        public SimpleClass Prop { get; set; }
-        public SimpleObjectProp(int value) => this.Prop = new SimpleClass(value);
-    }
-
-    public class SimpleStructProp
-    {
-        public SimpleStruct Prop { get; set; }
-        public SimpleStructProp(int value) => this.Prop = new SimpleStruct(100);
     }
 
     public struct SimpleStruct
@@ -36,9 +22,13 @@
         public int Prop { get; set; }
     }
 
-    public class SimpleInterfaceImp : SimpleInterface
+    public abstract class SimpleAbstract
     {
-        public int Prop { get; set; }
-        public SimpleInterfaceImp(int value) => this.Prop = value;
+        public abstract int Prop { get; set; }
+    }
+
+    public static class SimpleStaticClass
+    {
+        public static int Prop { get; set; }
     }
 }
