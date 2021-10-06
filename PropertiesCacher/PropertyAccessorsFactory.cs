@@ -64,7 +64,7 @@ namespace PropertiesCacher
                 emit.LoadArgument(1);
                 emit.CastClass(mi.DeclaringType);
 
-                emit.Call(mi);
+                emit.CallVirtual(mi);
                 if (mi.ReturnType.IsValueType)
                     emit.Box(mi.ReturnType);
                 else
@@ -100,7 +100,7 @@ namespace PropertiesCacher
                 else
                     emit.CastClass(argType);
 
-                emit.Call(mi);
+                emit.CallVirtual(mi);
                 emit.Return();
             }
 
