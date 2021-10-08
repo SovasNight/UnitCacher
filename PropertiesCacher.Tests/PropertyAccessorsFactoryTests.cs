@@ -149,5 +149,18 @@ namespace PropertiesCacher.Tests
             object result = Assets.SimpleStaticClass.Prop;
             Assert.Equal(except, result);
         }
+
+        [Fact]
+        public void CreateFact_TestClass_PropsEqualsFact() {
+            PropertyInfo pi = typeof(Assets.TestClass).GetProperty("IntProp");
+
+            PropertyFact fact = new PropertyAccessorsFactory().CreateFact(pi);
+
+            Assert.True(
+                fact.PropertyName == pi.Name &&
+                fact.PropertyType == pi.PropertyType &&
+                fact.DeclaringType == pi.DeclaringType
+                );
+        }
     }
 }
