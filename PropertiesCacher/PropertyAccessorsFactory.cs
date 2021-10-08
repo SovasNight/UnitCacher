@@ -34,15 +34,63 @@ namespace PropertiesCacher
             string typeName = String.Format("{0}_{1}_Accessor", pi.DeclaringType.Name, pi.Name);
             TypeBuilder typeBuilder = this.moduleBuilder.DefineType(typeName, TypeAttributes.Public, baseType);
 
-            MethodInfo get_value = this.CreateGetter(typeBuilder, pi.GetGetMethod());
-            typeBuilder.DefineMethodOverride(get_value, baseType.GetMethod("Get_Value"));
-
-            MethodInfo set_value = this.CreateSetter(typeBuilder, pi.GetSetMethod());
-            typeBuilder.DefineMethodOverride(set_value, baseType.GetMethod("Set_Value"));
+            this.DefineAccessorMethods(typeBuilder, pi);
 
             Type accessorType = typeBuilder.CreateType();
 
             return (PropertyAccessor)Activator.CreateInstance(accessorType);
+        }
+
+        /// <summary>
+        /// Define and override methods:
+        /// <see cref="PropertyAccessor.Get_Value(object)"/> and
+        /// <see cref="PropertyAccessor.Set_Value(object, object)"/>
+        /// </summary>
+        /// <remarks>
+        /// Use for creating descernats from <see cref="PropertyAccessor"/>
+        /// </remarks>
+        protected void DefineAccessorMethods(TypeBuilder typeBuilder, PropertyInfo pi) {
+            MethodInfo get_value = this.CreateGetter(typeBuilder, pi.GetGetMethod());
+            typeBuilder.DefineMethodOverride(get_value, typeBuilder.BaseType.GetMethod("Get_Value"));
+
+            MethodInfo set_value = this.CreateSetter(typeBuilder, pi.GetSetMethod());
+            typeBuilder.DefineMethodOverride(set_value, typeBuilder.BaseType.GetMethod("Set_Value"));
+        }
+
+        /// <summary>
+        /// Create <see cref="PropertyFact"/> for specifed property
+        /// using <see cref="PropertyInfo"/>
+        /// </summary>
+        public PropertyFact CreateFact(PropertyInfo pi) {
+            Type baseType = typeof(PropertyFact);
+            string typeName = String.Format("{0}_{1}_Fact", pi.DeclaringType.Name, pi.Name);
+            TypeBuilder typeBuilder = this.moduleBuilder.DefineType(typeName, TypeAttributes.Public, baseType);
+
+            ConstructorInfo baseCtor = baseType.GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic)[0];
+            _ = this.CreateConstructor(typeBuilder, baseCtor);
+
+            this.DefineAccessorMethods(typeBuilder, pi);
+
+            Type factType = typeBuilder.CreateType();
+
+            ConstructorInfo ctor = factType.GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic)[0];
+            object[] args = new object[] { pi.Name, pi.PropertyType, pi.DeclaringType };
+            return (PropertyFact)ctor.Invoke(args);
+        }
+
+        /// <summary>
+        /// Create <see cref="PropertyFact"/> for all properties 
+        /// wich passing <see cref="BindingFlags"/>
+        /// </summary>
+        public PropertyFact[] GetProperties(Type type, BindingFlags bindingAttr) {
+            PropertyInfo[] properties = type.GetProperties(bindingAttr);
+            var accessors = new PropertyFact[properties.Length];
+            
+            for (int i = 0; i < properties.Length; i++) {
+                accessors[i] = this.CreateFact(properties[i]);
+            }
+
+            return accessors;
         }
 
         private MethodInfo CreateGetter(TypeBuilder typeBuilder, MethodInfo mi) {
@@ -117,6 +165,21 @@ namespace PropertiesCacher
             }
 
             return emit.CreateMethod();
+        }
+
+        private ConstructorInfo CreateConstructor(TypeBuilder typeBuilder, ConstructorInfo baseConstructor) {
+            var emit = Emit<Action<string, Type, Type>>.BuildConstructor(
+                typeBuilder, MethodAttributes.Private);
+
+            emit.LoadArgument(0);
+            emit.LoadArgument(1);
+            emit.LoadArgument(2);
+            emit.LoadArgument(3);
+
+            emit.Call(baseConstructor);
+            emit.Return();
+
+            return emit.CreateConstructor();
         }
     }
 }
